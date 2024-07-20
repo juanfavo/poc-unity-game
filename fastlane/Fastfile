@@ -1,0 +1,64 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "IOS lanes"
+  lane :update_team do |options|
+    update_project_team(
+      path: options[:xcodeproj],
+      teamid: options[:teamid]
+    )
+  end
+
+  lane :update_provisioning_profile do |options|
+    update_project_provisioning(
+      xcodeproj: options[:xcodeproj],
+      profile: options[:profile],
+      target_filter: options[:target],
+      code_signing_identity: options[:code_signing]
+    )
+  end
+
+  lane :edge do |options|
+    api_key = app_store_connect_api_key(
+      issuer_id: ENV["ISSUER_ID"],
+      key_id: ENV["KEY_ID"],
+      key_content: ENV["KEY_CONTENT"],
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: options[:file],
+      groups: options[:group],
+      changelog: options[:changelog],
+      wait_processing_timeout_duration: 1800,
+      # distribute_external: true,
+      # notify_external_testers: true,
+      reject_build_waiting_for_review: false,
+      expire_previous_builds: false,
+      submit_beta_review: true,
+      skip_submission: true,
+      skip_waiting_for_build_processing: true,
+    )
+  end
+
+  lane :release do |options|
+    api_key = app_store_connect_api_key(
+      issuer_id: ENV["ISSUER_ID"],
+      key_id: ENV["KEY_ID"],
+      key_content: ENV["KEY_CONTENT"],
+    )
+
+    upload_to_app_store(
+      api_key: api_key,
+      ipa: options[:file],
+      skip_binary_upload: false,
+      skip_screenshots: true,
+      skip_metadata: true,
+      reject_if_possible: true,
+      automatic_release: true,
+      submit_for_review: false,
+      precheck_include_in_app_purchases: false,
+      force: true,
+    )
+  end
+end
