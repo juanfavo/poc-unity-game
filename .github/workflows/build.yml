@@ -100,15 +100,9 @@ jobs:
         run: |
           mkdir -p iOS/fastlane
           cp fastlane/Fastfile iOS/fastlane
-
-      - name: list iOS file
-        run: ls iOS
       
       - name: Set up Xcode version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
-
-      - name: Show current version of Xcode
-        run: xcodebuild -version
 
       - name: Import signing certificate
         env:
@@ -128,11 +122,6 @@ jobs:
                           -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "" iOS-dev
 
-      - name: List Library files
-        run: |
-          LIBRARY_HOME="$HOME/Library"
-          ls $LIBRARY_HOME
-
       - name: Import provisioning profile
         env:
           PROVISIONING_PROFILE_DATA: ${{ secrets.PROVISIONING_PROFILE }}
@@ -149,7 +138,7 @@ jobs:
           # mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           # echo "$PROVISIONING_PROFILE_DATA" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile_dev.mobileprovision
 
-          echo "Saved provisioning profile $HOME/Library/MobileDevice/Provisioning Profiles/$UUID.mobileprovision"          
+          echo "Saved provisioning profile $HOME/Library/MobileDevice/Provisioning Profiles/profile_dev.mobileprovision"          
 
       - name: List Library files
         run: |
@@ -170,6 +159,11 @@ jobs:
         run: |
           PROFILES_HOME="$HOME/Library/MobileDevice/Provisioning Profiles/profile_dev.mobileprovision"
           fastlane ios update_provisioning_profile xcodeproj:"Unity-iPhone.xcodeproj" profile:"$PROFILES_HOME" target:"Unity-iPhone" code_signing:"Apple Distribution"
+
+      - name: Increment build number
+        working-directory: ./iOS
+        run: |
+          agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "${{ vars.APP_STORE_APP_ID }}") + 1))
         
       - name: Build for TestFlight
         working-directory: ./iOS
@@ -188,20 +182,31 @@ jobs:
           xcodebuild -exportArchive \
           -archivePath ./unity-game.xcarchive \
           -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
-          -exportPath ./build \
-          -allowProvisioningUpdates
-
+          -exportPath ./build
+      
       - name: Upload app to TestFlight
-        working-directory: ./iOS
         env:
-          LC_ALL: en_US.UTF-8
-          LANG: en_US.UTF-8
-          ISSUER_ID: ${{ vars.APPSTORE_ISSUER_ID }}
-          KEY_ID: ${{ vars.APPSTORE_API_KEY_ID }}
-          KEY_CONTENT: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          APPSTORE_ISSUER_ID: ${{ vars.APPSTORE_ISSUER_ID }}
+          APPSTORE_API_KEY_ID: ${{ vars.APPSTORE_API_KEY_ID }}
+        working-directory: ./iOS
         run: |
           APP_FILE=$(find $(pwd) -name "*.ipa")
-          fastlane ios edge file:"$APP_FILE" group:"external-testers" changelog:"my changelog" environment:"staging"
+          mkdir -p $RUNNER_TEMP/private_keys
+          echo -n "$APPSTORE_API_PRIVATE_KEY" | base64 --decode -o $RUNNER_TEMP/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
+          xcrun altool --upload-app -f $APP_FILE --type ios --apiKey $APPSTORE_API_KEY_ID --apiIssuer $APPSTORE_ISSUER_ID --show-progress
+
+      # - name: Upload app to TestFlight
+      #   working-directory: ./iOS
+      #   env:
+      #     LC_ALL: en_US.UTF-8
+      #     LANG: en_US.UTF-8
+      #     ISSUER_ID: ${{ vars.APPSTORE_ISSUER_ID }}
+      #     KEY_ID: ${{ vars.APPSTORE_API_KEY_ID }}
+      #     KEY_CONTENT: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+      #   run: |
+      #     APP_FILE=$(find $(pwd) -name "*.ipa")
+      #     fastlane ios edge file:"$APP_FILE" group:"external-testers" changelog:"my changelog" environment:"staging"
     
   # TestFlight:
   #   name: Publish to TestFlight
