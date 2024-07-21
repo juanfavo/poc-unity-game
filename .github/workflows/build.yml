@@ -192,8 +192,8 @@ jobs:
         working-directory: ./iOS
         run: |
           APP_FILE=$(find $(pwd) -name "*.ipa")
-          mkdir -p $RUNNER_TEMP/private_keys
-          echo -n "$APPSTORE_API_PRIVATE_KEY" | base64 --decode -o $RUNNER_TEMP/private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
+          mkdir private_keys
+          echo -n "$APPSTORE_API_PRIVATE_KEY" | base64 --decode -o private_keys/AuthKey_$APPSTORE_API_KEY_ID.p8
           xcrun altool --upload-app -f $APP_FILE --type ios --apiKey $APPSTORE_API_KEY_ID --apiIssuer $APPSTORE_ISSUER_ID --show-progress
 
       # - name: Upload app to TestFlight
