@@ -150,6 +150,10 @@ jobs:
         run: |
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool NO" Info.plist
 
+      - name: Increment build number
+        working-directory: ./iOS
+        run: fastlane ios increment_build xcodeproj:"Unity-iPhone.xcodeproj"
+
       - name: SET developer team
         working-directory: ./iOS
         run: fastlane ios update_team xcodeproj:"Unity-iPhone.xcodeproj" teamid:"LP2BU7GA9G"
@@ -160,10 +164,11 @@ jobs:
           PROFILES_HOME="$HOME/Library/MobileDevice/Provisioning Profiles/profile_dev.mobileprovision"
           fastlane ios update_provisioning_profile xcodeproj:"Unity-iPhone.xcodeproj" profile:"$PROFILES_HOME" target:"Unity-iPhone" code_signing:"Apple Distribution"
 
-      - name: Increment build number
-        working-directory: ./iOS
-        run: |
-          agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "${{ vars.APP_STORE_APP_ID }}") + 1))
+      # not work
+      # - name: Increment build number
+      #   working-directory: ./iOS
+      #   run: |
+      #     agvtool new-version -all $(($(app-store-connect get-latest-testflight-build-number "${{ vars.APP_STORE_APP_ID }}") + 1))
         
       - name: Build for TestFlight
         working-directory: ./iOS
@@ -209,7 +214,7 @@ jobs:
       #     fastlane ios edge file:"$APP_FILE" group:"external-testers" changelog:"my changelog" environment:"staging"
     
   # TestFlight:
-  #   name: Publish to TestFlight
+  #   name: Publish to TestFlight with codemagic
   #   runs-on: macos-latest
   #   needs: buildAndTestForLinuxBasedPlatforms
   #   env:

@@ -1,6 +1,24 @@
 default_platform(:ios)
 
 platform :ios do
+  desc "Run Unit Tests"
+  lane :unit_tests do |options|
+    run_tests(
+      scheme: options[:scheme],
+      project: options[:xcodeproj],
+      devices: [“iPhone 11 Pro Max”]
+    )
+  end
+
+  desc "Run UI Tests"
+  lane :ui_tests do |options|
+    run_tests(
+      project: "Unity-iPhone.xcodeproj",
+      devices: ["iPhone 11 Pro Max"],
+      scheme: "Unity-iPhoneUITests"
+    )
+  end
+
   desc "IOS lanes"
   lane :update_team do |options|
     update_project_team(
@@ -60,5 +78,48 @@ platform :ios do
       precheck_include_in_app_purchases: false,
       force: true,
     )
+  end
+
+  desc "Incrementing Build Number"
+  lane :increment_build do |options|
+    version = get_version_number(
+      xcodeproj: options[:xcodeproj]
+    )
+    current_build_number = latest_testflight_build_number(version: version)
+    increment_build_number(build_number: current_build_number + 1)
+  end
+
+  desc "Install Profiles and Build My App"
+  lane :build_ipa do
+    install_provisioning_profile(
+      path: "FULL_PATH_OF_YOUR_PROVISIONING_PROFILE"
+    )
+    gym(
+      workspace: "Unity-iPhone.xcworkspace",
+      scheme: "Unity-iPhone",
+      output_directory: "DIRECTORY_WHERE_YOUR_IPA_WILL_BE_SAVED",
+      output_name: "Unity-iPhoneFastlane",
+      export_method: "app-store",
+      include_bitcode: false,
+      clean: true
+    )
+    
+    end
+    desc: "Releae Unity-iPhone App to TestFlight"
+    lane: release_Unity-iPhone_to_testflight do
+      # Increment Build Number
+      increment_build
+      # Build your app
+      build_ipa
+      # Set up App Store Connect API Key to avoid 2FA
+      api_key = app_store_connect_api_key(
+        key_id: "YOUR_API_KEY",
+        issuer_id: "ISSUER_ID",
+         key_filepath: "PATH_OF_API_KEY_FILE/AuthKey_YOUR_API_KEY.p8",
+         duration: 1200, # optional
+         in_house: false, # optional but may be required if using match/sigh
+        )
+        # Distribute App to TestFlight
+        pilot(api_key: api_key, ipa:  "output_directory/output_name.ipa",  skip_waiting_for_build_processing: true)
   end
 end
