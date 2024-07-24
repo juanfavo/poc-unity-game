@@ -98,11 +98,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create Entitlements
-        working-directory: ./iOS
-        run: |
-          echo ${{ secrets.STG_ENTITLEMENTS }} | base64 -d > Unity-iPhone/Unity-iPhone.entitlements
-
       - name: Copy ExportOptions
         env:
           EXPORT_OPTIONS_PLIST: ${{ secrets.EXPORT_OPTIONS_PLIST }}
@@ -158,11 +153,11 @@ jobs:
           # echo "$PROVISIONING_PROFILE_DATA" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile_dev.mobileprovision
 
           echo "Saved provisioning profile $HOME/Library/MobileDevice/Provisioning Profiles/profile_dev.mobileprovision"          
-
-      - name: List Library files
+      
+      - name: Create Entitlements
+        working-directory: ./iOS
         run: |
-          LIBRARY_HOME="$HOME/Library"
-          ls $LIBRARY_HOME
+          echo ${{ secrets.STG_ENTITLEMENTS }} | base64 -d > Unity-iPhone/Unity-iPhone.entitlements
 
       - name: Customize Plist
         working-directory: ./iOS
