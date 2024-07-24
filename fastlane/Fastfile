@@ -27,6 +27,7 @@ platform :ios do
     )
   end
 
+  desc "Update provisioning profile"
   lane :update_provisioning_profile do |options|
     update_project_provisioning(
       xcodeproj: options[:xcodeproj],
@@ -36,6 +37,7 @@ platform :ios do
     )
   end
 
+  desc "EDGE"
   lane :edge do |options|
     api_key = app_store_connect_api_key(
       issuer_id: ENV["ISSUER_ID"],
@@ -59,6 +61,7 @@ platform :ios do
     )
   end
 
+  desc "Release"
   lane :release do |options|
     api_key = app_store_connect_api_key(
       issuer_id: ENV["ISSUER_ID"],
@@ -103,23 +106,27 @@ platform :ios do
       include_bitcode: false,
       clean: true
     )
-    
-    end
-    desc: "Releae Unity-iPhone App to TestFlight"
-    lane: release_Unity-iPhone_to_testflight do
-      # Increment Build Number
-      increment_build
-      # Build your app
-      build_ipa
-      # Set up App Store Connect API Key to avoid 2FA
-      api_key = app_store_connect_api_key(
-        key_id: "YOUR_API_KEY",
-        issuer_id: "ISSUER_ID",
-         key_filepath: "PATH_OF_API_KEY_FILE/AuthKey_YOUR_API_KEY.p8",
-         duration: 1200, # optional
-         in_house: false, # optional but may be required if using match/sigh
-        )
-        # Distribute App to TestFlight
-        pilot(api_key: api_key, ipa:  "output_directory/output_name.ipa",  skip_waiting_for_build_processing: true)
+  end
+
+  desc: "Releae Unity-iPhone App to TestFlight"
+  lane: release_Unity-iPhone_to_testflight do
+    # Increment Build Number
+    increment_build
+    # Build your app
+    build_ipa
+    # Set up App Store Connect API Key to avoid 2FA
+    api_key = app_store_connect_api_key(
+      key_id: "YOUR_API_KEY",
+      issuer_id: "ISSUER_ID",
+      key_filepath: "PATH_OF_API_KEY_FILE/AuthKey_YOUR_API_KEY.p8",
+      duration: 1200, # optional
+      in_house: false, # optional but may be required if using match/sigh
+    )
+    # Distribute App to TestFlight
+    pilot(
+      api_key: api_key,
+      ipa:  "output_directory/output_name.ipa",
+      skip_waiting_for_build_processing: true
+    )
   end
 end
