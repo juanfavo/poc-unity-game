@@ -99,6 +99,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create Entitlements
+        working-directory: ./iOS
         run: |
           echo ${{ secrets.STG_ENTITLEMENTS }} | base64 -d > Unity-iPhone/Unity-iPhone.entitlements
 
