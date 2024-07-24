@@ -71,6 +71,12 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+/[Aa]ssets/Editor Default Resources/
+/[Aa]ssets/ExternalDependencyManager/
+/[Aa]ssets/Firebase/
+/[Aa]ssets/Parse/
+/[Aa]ssets/Plugins/
+
 # Windows
 Thumbs.db
 Thumbs.db.meta
@@ -81,6 +87,7 @@ Thumbs.db.meta
 # VS Code
 *.vscode
 
-# Ignore temporaries from GameCI
-/[Aa]rtifacts/
-/[Cc]odeCoverage/
+# Private files
+google-services.json
+google-services-*.json
+GoogleService-info.plist

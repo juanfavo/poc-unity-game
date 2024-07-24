@@ -25,6 +25,11 @@ jobs:
           fetch-depth: 0
           lfs: true
 
+      - name: Replace firebase configuration files
+        run: |
+          echo ${{ secrets.STG_GOOGLE_SERVICE_JSON }} | base64 -d > google-services.json
+          echo ${{ secrets.STG_GOOGLE_SERVICES_PLIST }} | base64 -d > GoogleService-Info.plist
+
       - name: Restore Library cache
         uses: actions/cache@v4
         with:
@@ -83,6 +88,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create Entitlements
+        run: |
+          echo ${{ secrets.STG_ENTITLEMENTS }} | base64 -d > Unity-iPhone/Unity-iPhone.entitlements
 
       - name: Copy ExportOptions
         env:
@@ -149,6 +158,9 @@ jobs:
         working-directory: ./iOS
         run: |
           /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool NO" Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes array" Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes: string audio" Info.plist
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes: string remote-notification" Info.plist
 
       - name: Increment build number
         working-directory: ./iOS

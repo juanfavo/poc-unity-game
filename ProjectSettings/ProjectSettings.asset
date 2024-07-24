@@ -140,7 +140,10 @@ PlayerSettings:
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
   bundleVersion: 1.0.2
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 4022533679521036310, guid: 8b46598eb49094dd1ab580bb49279ffb, type: 2}
+  - {fileID: 11400000, guid: b02eed8d378ac43ed88cf37aeb975ede, type: 2}
+  - {fileID: 11400000, guid: 3227e09952aed469789358059f404127, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -164,7 +167,7 @@ PlayerSettings:
     Android: com.lyly.unity.game
     Lumin: com.DefaultCompany.com.unity.template.mobile2D
     Standalone: com.DefaultCompany.com.unity.template.mobile2D
-    iPhone: com.lyly.unity.game
+    iPhone: com.lyly.player.stg
     tvOS: com.DefaultCompany.com.unity.template.mobile2D
   buildNumber:
     Standalone: 0
