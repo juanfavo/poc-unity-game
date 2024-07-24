@@ -83,15 +83,6 @@ platform :ios do
     )
   end
 
-  desc "Incrementing Build Number"
-  lane :increment_build do |options|
-    version = get_version_number(
-      xcodeproj: options[:xcodeproj]
-    )
-    current_build_number = latest_testflight_build_number(version: version)
-    increment_build_number(build_number: current_build_number + 1)
-  end
-
   desc "Install Profiles and Build My App"
   lane :build_ipa do
     install_provisioning_profile(
@@ -110,8 +101,6 @@ platform :ios do
 
   desc "Publish App to TestFlight"
   lane :publish_to_testflight do
-    # Increment Build Number
-    increment_build
     # Build your app
     build_ipa
     # Set up App Store Connect API Key to avoid 2FA
