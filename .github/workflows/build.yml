@@ -25,11 +25,6 @@ jobs:
           fetch-depth: 0
           lfs: true
 
-      - name: Replace firebase configuration files
-        run: |
-          echo ${{ secrets.STG_GOOGLE_SERVICE_JSON }} | base64 -d > Assets/google-services.json
-          echo ${{ secrets.STG_GOOGLE_SERVICES_PLIST }} | base64 -d > Assets/GoogleService-Info.plist
-
       - name: Restore Library cache
         uses: actions/cache@v4
         with:
@@ -37,6 +32,11 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
+
+      - name: Replace firebase configuration files
+        run: |
+          echo ${{ secrets.STG_GOOGLE_SERVICE_JSON }} | base64 -d > Assets/google-services.json
+          echo ${{ secrets.STG_GOOGLE_SERVICES_PLIST }} | base64 -d > Assets/GoogleService-Info.plist
 
       # - name: Restore Library cache
       #   uses: actions/cache@v4
