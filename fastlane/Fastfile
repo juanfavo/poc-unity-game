@@ -108,8 +108,8 @@ platform :ios do
     )
   end
 
-  desc: "Publish App to TestFlight"
-  lane: publish_to_testflight do
+  desc "Publish App to TestFlight"
+  lane :publish_to_testflight do
     # Increment Build Number
     increment_build
     # Build your app
@@ -119,8 +119,8 @@ platform :ios do
       key_id: "YOUR_API_KEY",
       issuer_id: "ISSUER_ID",
       key_filepath: "PATH_OF_API_KEY_FILE/AuthKey_YOUR_API_KEY.p8",
-      duration: 1200, # optional
-      in_house: false, # optional but may be required if using match/sigh
+      duration: 1200,
+      in_house: false
     )
     # Distribute App to TestFlight
     pilot(
