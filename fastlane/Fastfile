@@ -108,8 +108,8 @@ platform :ios do
     )
   end
 
-  desc: "Releae Unity-iPhone App to TestFlight"
-  lane: release_Unity-iPhone_to_testflight do
+  desc: "Publish App to TestFlight"
+  lane: publish_to_testflight do
     # Increment Build Number
     increment_build
     # Build your app
